@@ -1,0 +1,44 @@
+
+/*login page stuff for css*/
+#main-header{
+	font-size: 40px;
+}
+
+#bottom-bar {
+	padding-top: 1%;
+	padding-bottom: 1%;
+}
+
+#middle-bar {
+	padding-top: 5%;
+	padding-bottom: 5%;
+}
+
+#login {
+	padding-right: 40px;
+}
+#social {
+	padding-left: 40px;
+}
+
+/*main page css stuff*/
+
+
+.bar {
+  fill: steelblue;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
