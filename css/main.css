@@ -21,24 +21,40 @@
 	padding-left: 40px;
 }
 
-/*main page css stuff*/
+.right-align {
+	text-align: right;
+}
+
+.left-align {
+	text-align: left;
+}
+
+.row {
+	padding: 2px;
+}
+/*home page css stuff*/
 
 
 .bar {
-  fill: steelblue;
+	cursor: pointer;
+	fill: steelblue;
+}
+
+.bar:hover{
+	fill: firebrick;
 }
 
 .axis text {
-  font: 10px sans-serif;
+	font: 10px sans-serif;
 }
 
 .axis path,
 .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
 }
 
 .x.axis path {
-  display: none;
+	display: none;
 }

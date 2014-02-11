@@ -39,17 +39,96 @@
 
     <div class="ui two column center aligned stackable grid">
       <div class="column d3">
-        <h1></h1>
-        <svg class="chart"></svg>
-      </div>
-      <div class="column d3">
+        <h3 class="ui dividing header left-align">Graph1</h3>
         <svg class="chart1"></svg>
       </div>
+      <div class="column d3">
+        <!-- graph type stuff -->
+        <h3 class="ui dividing header left-align">Settings</h3>
+        <div class="ui three column divided grid">
+          <div class="column">
+
+            <div class="field">
+              <label>Ticker 1</label>
+              <input type="text">
+            </div>
+            <div class="field">
+              <label>Ticker 2</label>
+              <input type="text">
+            </div>
+            <div class="field">
+              <label>Ticker 3</label>
+              <input type="text">
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="ui dropdown graph1">
+              <div class="text">Graph 1</div>
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                <div class="item">30 Day Volatility</div>
+                <div class="item">60 Day Volatility</div>
+                <div class="item">90 Day Volatility</div>
+                <div class="item">120 Day Volatility</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="ui dropdown graph2">
+              <div class="text">Graph 2</div>
+              <i class="dropdown icon"></i>
+              <div class="menu">
+                <div class="item">30 Day Volatility</div>
+                <div class="item">60 Day Volatility</div>
+                <div class="item">90 Day Volatility</div>
+                <div class="item">120 Day Volatility</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- submit button -->
+
+
+      </div>
+
     </div>
 
     <div class="ui two column center aligned stackable grid">
-      <div class="column d3">STATS1</div>
-      <div class="column d3">STATS2</div>
+      <div class="column d3">
+      <h3 class="ui dividing header left-align">Graph2</h3>
+        <svg class="chart2"></svg>
+      </div>
+      <div class="column d3">
+         <h3 class="ui dividing header left-align">Stats</h3>
+         <div class="ui two column divided grid">
+          <div class="column">
+            <div class="row right-align">Ticker</div>
+            <div class="row right-align">Name</div>
+            <div class="row right-align">30 Day Volatility</div>
+            <div class="row right-align">60 Day Volatility</div>
+            <div class="row right-align">90 Day Volatility</div>
+            <div class="row right-align">120 Day Volatility</div>
+            <div class="row right-align">Price</div>
+            <div class="row right-align">P/E</div>
+            <div class="row right-align">EPS</div>
+            <div class="row right-align">Beta</div>
+          </div>
+          <div class="column">
+            <div id="ticker" class="row"></div>
+            <div id="niceName" class="row"></div>
+            <div id="30" class="row"></div>
+            <div id="60" class="row"></div>
+            <div id="90" class="row"></div>
+            <div id="120" class="row"></div>
+            <div id="Price" class="row"></div>
+            <div id="PE" class="row"></div>
+            <div id="EPS" class="row"></div>
+            <div id="Beta" class="row"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
 
