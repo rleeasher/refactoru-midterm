@@ -31,7 +31,7 @@
             <a class="item">Settings</a>
             <a class="item">Report a bug</a>
             <a class="item">Stock Request</a>
-            <a class="item">Logout</a>
+            <a id="logout" class="item">Logout</a>
           </div>
         </div>
       </div>
@@ -50,15 +50,15 @@
 
             <div class="field">
               <label>Ticker 1</label>
-              <input type="text">
+              <input class="ticker" type="text">
             </div>
             <div class="field">
               <label>Ticker 2</label>
-              <input type="text">
+              <input class="ticker" type="text">
             </div>
             <div class="field">
               <label>Ticker 3</label>
-              <input type="text">
+              <input class="ticker" type="text">
             </div>
           </div>
 
@@ -89,6 +89,14 @@
           </div>
         </div>
         <!-- submit button -->
+        <div class = "setting-submit">
+          <div id="draw-graph" class="fluid ui green animated massive button">
+            <div class="visible content">Draw Graphs</div>
+            <div class="hidden content">
+              <i class="right arrow icon"></i>
+            </div>
+          </div>
+        </div>
 
 
       </div>

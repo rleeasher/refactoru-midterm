@@ -21,6 +21,8 @@
 	padding-left: 40px;
 }
 
+
+/*home page css stuff*/
 .right-align {
 	text-align: right;
 }
@@ -32,8 +34,12 @@
 .row {
 	padding: 2px;
 }
-/*home page css stuff*/
 
+.setting-submit {
+	padding: 40px 0 0 0;
+}
+
+/*d3 stuff*/
 
 .bar {
 	cursor: pointer;

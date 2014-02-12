@@ -35,6 +35,7 @@ var marketData = {
       "Price": 180.01,
       "PE": 9.87,
       "EPS": 18.24,
+      "Color": "#1abc9c",
       "Beta": 1
 
     },
@@ -48,6 +49,7 @@ var marketData = {
       "Price": 35.17,
       "PE": 124.54,
       "EPS": 0.28,
+      "Color": "#d35400",
       "Beta": 0.95
     },
     {
@@ -60,6 +62,7 @@ var marketData = {
       "Price": 1172.93,
       "PE": 32.54,
       "EPS": 36.05,
+      "Color": "#8e44ad",
       "Beta": 0.98
     },
     {
@@ -72,6 +75,7 @@ var marketData = {
       "Price": 528.99,
       "PE": 13.12,
       "EPS": 40.32,
+      "Color": "#2c3e50",
       "Beta": 0.97
     },
     {
@@ -84,6 +88,7 @@ var marketData = {
       "Price": 36.80,
       "PE": 13.59,
       "EPS": 2.71,
+      "Color": "#2980b9",
       "Beta": 0.9
     },
     {
@@ -96,6 +101,7 @@ var marketData = {
       "Price": 63.57,
       "PE": 96.89,
       "EPS": 0.66,
+      "Color": "#e74c3c",
       "Beta": null
     },
     {
@@ -108,6 +114,7 @@ var marketData = {
       "Price": 37.30,
       "PE": 15.87,
       "EPS": 2.35,
+      "Color": "#f1c40f",
       "Beta": 1.21
     },
     {
@@ -120,6 +127,7 @@ var marketData = {
       "Price": 52.92,
       "PE": null,
       "EPS": -1.69,
+      "Color": "SlateGray",
       "Beta": null
     },
     {
@@ -132,7 +140,8 @@ var marketData = {
       "Price": 207.33,
       "PE": 905.89,
       "EPS": 0.23,
-      "Beta": null
+      "Color": "Teal",
+      "Beta": 1.34
     }
   ]
 }
