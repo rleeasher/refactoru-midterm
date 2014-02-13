@@ -33,6 +33,10 @@ function type(d) {
   return d;
 }
 
+function typearr(p) {
+  p = +p; // coerce to number reg array
+  return p;
+}
 
 function pluck(arr, key) { 
     return map(arr, function(e) { return e[key]; }) 

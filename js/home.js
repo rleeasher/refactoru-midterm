@@ -1,6 +1,28 @@
 $(function(){  
 
-	var stockData = [];
+	var stockDataArr = [];
+
+	var StockObject = function(ticker,niceName,vol30,vol60,vol90,vol120,Bid,Ask,Change,PE,EPS,MktCap,color){
+		this.ticker = ticker;
+		this.niceName = niceName;
+		this.vol30 = vol30;
+		this.vol60 = vol60;
+		this.vol90 = vol90;
+		this.vol120 = vol120;
+		this.Bid = Bid;
+		this.Ask = Ask;
+		this.Change = Change;
+		this.PE = PE;
+		this.EPS = EPS;
+		this.MktCap = MktCap;
+		this.color = color
+	};
+
+	var randColor = function () {
+		var colors = pluck(marketData.stockList,"Color");
+		var randomNum = Math.floor((Math.random()*colors.length)+1);
+		return colors[randomNum];
+	};
 
 //creates a date formate necessary for yahoo api
 	var niceDate = function (offset) {
@@ -14,24 +36,22 @@ $(function(){
 	};
 
 	var calculateVariance = function(arr) {
-		var r = {mean: 0, variance: 0, deviation: 0}, t = arr.length;
-	 		for(var m, s = 0, l = t; l--; s += arr[l]);
-	  		for(m = r.mean = s / t, l = t, s = 0; l--; s += Math.pow(arr[l] - m, 2));
-	  	return r.deviation = Math.sqrt(r.variance = s / t), r;
+		var r = {mean: 0, variance: 0, deviation: 0}, t = Math.sqrt(252);
+		var sumMean = 0;
+		for (i=1;i<arr.length;i++){ sumMean += Math.pow(Math.log(arr[i]/arr[i-1]),2) };
+		var stdDev = Math.sqrt(sumMean / arr.length);
+		var volatility = stdDev * t;
+
+	  	return volatility;
 	};
 
 
 	//create an object using a json pull from yahoo
 	var queryYahooFinance = function (ticker, callback) {
-
 		var str1 = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.historicaldata%20where%20symbol%20%3D%20%22'
-	//ticker
 		var str2 = '%22%20and%20startDate%20%3D%20%22'
-	//startdate
 		var str3 = '%22%20and%20endDate%20%3D%20%22'
-	//enddate
 		var str4 = '%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback='
-
 		var startDate = niceDate(1);
 		var endDate = niceDate(0);
 		var stktkr = ticker;
@@ -41,42 +61,70 @@ $(function(){
 		  $.each(data.query.results.quote, function(key, val) {
 		    items.push(val);
 		  });
-
-			var variance = calculateVariance(pluck(items,"Close"));
-			console.log(variance);
-
 		  	callback(items);
 		});
 
-
-
 	}
 
+	var getStockObject = function(ticker, callback){
+		var str = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20%3D%20%22'
+		+ ticker +'%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
+
+		$.getJSON(str,function(stockinfo){
+
+			if (stockinfo.query.results === null) {
+				getStockObject(ticker, function(){
+					console.log('failed');
+				});
+			} else {		
+				var stockInfo = stockinfo.query.results.quote;
+				callback(stockInfo);
+			}				
+		});
+	}
+
+
+	//create a stock object
 	var createStockObject = function (ticker) {
-		var arr = queryYahooFinance(ticker, function(data){ console.log(data); });
+		queryYahooFinance(ticker, function(data){ 
+			console.log(data);
+			var var1 = map(pluck(data,"Close").slice(0,120),typearr);
+			variance1 = calculateVariance(var1);
+			var var2 = var1.slice(0,90);
+			variance2 = calculateVariance(var2);
+			var var3 = var1.slice(0,60);
+			variance3 = calculateVariance(var3);
+			var var4 = var1.slice(0,30);
+			variance4 = calculateVariance(var4);
+
+			getStockObject(ticker, function(stockData){
+				console.log(stockData);
+				var obj = new StockObject(ticker,stockData.Name,variance4,variance3,variance2,variance1,stockData.Bid
+							,stockData.Ask,stockData.Change,stockData.PERatio,stockData.EarningsShare,stockData.MarketCapitalization,randColor());
+
+				if ($.inArray(ticker,pluck(stockDataArr,'ticker')) > -1) {
+					stockDataArr[$.inArray(ticker,pluck(stockDataArr,'ticker'))] = obj;
+				} else {
+					stockDataArr.push(obj);
+				}
+				console.log(stockDataArr);
+				setUpGraph();
+			});
+		});
 	}
 
-	createStockObject("YHOO");
-
-	console.log(niceDate(0));
-	console.log(niceDate(1));
 
 
 //d3 stuff getting the data
 	var getData = function(stocks,attr) {
 		var arr = [];
 		var indicies = [];
-		arr.push(
-			{	'name': 		marketData.stockList[0].niceName,
-				'metric':	marketData.stockList[0][attr]},
-			{	'name': 		marketData.stockList[1].niceName,
-				'metric':	marketData.stockList[1][attr]});
-
 		for (var i = 0; i < stocks.length; i++) {
-			var index = $.inArray(stocks[i],pluck(marketData.stockList,'ticker'));
-			arr.push({	'name': marketData.stockList[index].niceName,
-						'metric': marketData.stockList[index][attr], 
-						'color': marketData.stockList[index].Color
+			// var index = $.inArray(stocks[i],pluck(stocks,'ticker'));
+			arr.push({	'name': stocks[i].niceName,
+						'ticker': stocks[i].ticker,
+						'metric': stocks[i][attr], 
+						'color': stocks[i].color
 					})
 		};
 		console.log(arr);
@@ -86,10 +134,29 @@ $(function(){
 
 // get an individual object back
 	var getStock = function(stock) {
-		var index = $.inArray(stock,pluck(marketData.stockList,'niceName'));
-		return marketData.stockList[index];
+		var index = $.inArray(stock,pluck(stockDataArr,'ticker'));
+		return stockDataArr[index];
 	}
 
+//sets up drawing a graph
+	var setUpGraph = function () {
+		//set the graphs up with vars
+		var select1 = $('.graph1 > .menu > .active').text();
+		var select2 = $('.graph2 > .menu > .active').text();
+		console.log(select1);
+
+		$('#chart1-header').text(select1);
+		$('#chart2-header').text(select2);
+
+		var graphOne = ("vol" + select1.substring(0,2)).toString();
+		var graphTwo = ("vol" + select2.substring(0,2)).toString();
+		graphOne = graphOne === "vol" ? "vol30" : graphOne;
+		graphTwo = graphTwo === "vol" ? "vol30" : graphTwo;
+		graphOne = graphOne === "vol12" ? "vol120" : graphOne;
+		graphTwo = graphTwo === "vol12" ? "vol120" : graphTwo;
+		drawGraph(stockDataArr,graphOne,"chart1");
+		drawGraph(stockDataArr,graphTwo,"chart2");
+	};
 
 // this draws the graph 
 	var drawGraph = function (stocks, attribute, graphnum) {
@@ -155,7 +222,7 @@ $(function(){
 	        .enter().append("rect")
 	        .attr("class", "bar")
 	    //added in a data class
-		    .attr("data-class", function (d) {return d.name;})
+		    .attr("data-class", function (d) {return d.ticker;})
 		    .text(function (d) {return d.metric;})
 		    .style("fill", function (d) {return d.color;})
 	        .attr("x", function (d) {return x(d.name);})
@@ -171,72 +238,34 @@ $(function(){
 	    	.attr("y", function(d) { return y(d.metric);})
       		;
 
-
+      	displayStats(stockDataArr[stockDataArr.length-1]);
 	};
 
-	var redraw = function (x,y) {
-
-	};
 
 	//make a function that can display stats
-	var displayStats = function () {
-		var obj = getStock($(this).data("class"));
-		console.log(obj);
+	var displayStats = function (obj) {
+		// var obj = getStock($(this).data("class"));
+		// console.log(obj);
 		var fadeout = 500;
 		var fadein = 500;
-		$('#ticker').fadeOut(fadeout,function(){
-			$(this).text(obj.ticker).fadeIn(fadein);
-		});
-		$('#niceName').fadeOut(fadeout,function(){
-			$(this).text(obj.niceName).fadeIn(fadein);
-		});
-		$('#30').fadeOut(fadeout,function(){
-			$(this).text(obj[30]).fadeIn(fadein);
-		});
-		$('#60').fadeOut(fadeout,function(){
-			$(this).text(obj[60]).fadeIn(fadein);
-		});
-		$('#90').fadeOut(fadeout,function(){
-			$(this).text(obj[90]).fadeIn(fadein);
-		});
-		$('#120').fadeOut(fadeout,function(){
-			$(this).text(obj[120]).fadeIn(fadein);
-		});
-		$('#Price').fadeOut(fadeout,function(){
-			$(this).text(obj.Price).fadeIn(fadein);
-		});
-		$('#PE').fadeOut(fadeout,function(){
-			$(this).text(obj.PE).fadeIn(fadein);
-		});
-		$('#EPS').fadeOut(fadeout,function(){
-			$(this).text(obj.EPS).fadeIn(fadein);
-		});
-		$('#Beta').fadeOut(fadeout,function(){
-			$(this).text(obj.Beta).fadeIn(fadein);
-		});
-
+		$('#tickerlabel').fadeOut(fadeout,function(){ $(this).text(obj.ticker).fadeIn(fadein); });
+		$('#niceName').fadeOut(fadeout,function(){ $(this).text(obj.niceName).fadeIn(fadein); });
+		$('#30').fadeOut(fadeout,function(){ $(this).text(obj.vol30.toFixed(2)).fadeIn(fadein); });
+		$('#60').fadeOut(fadeout,function(){ $(this).text(obj.vol60.toFixed(2)).fadeIn(fadein); });
+		$('#90').fadeOut(fadeout,function(){ $(this).text(obj.vol90.toFixed(2)).fadeIn(fadein); });
+		$('#120').fadeOut(fadeout,function(){ $(this).text(obj.vol120.toFixed(2)).fadeIn(fadein); });
+		$('#Change').fadeOut(fadeout,function(){ $(this).text(obj.Change+"%").fadeIn(fadein); });
+		$('#Bid').fadeOut(fadeout,function(){ $(this).text(obj.Bid).fadeIn(fadein); });
+		$('#Ask').fadeOut(fadeout,function(){ $(this).text(obj.Ask).fadeIn(fadein); });
+		$('#PE').fadeOut(fadeout,function(){ $(this).text(obj.PE).fadeIn(fadein); });
+		$('#EPS').fadeOut(fadeout,function(){ $(this).text(obj.EPS).fadeIn(fadein); });
+		$('#MktCap').fadeOut(fadeout,function(){ $(this).text(obj.MktCap).fadeIn(fadein); });
 	};
 
 	var setGraphs = function () {
-		var stockArr = [];
-		var graphOne = $('.graph1 > .menu > .active').text().substring(0,2) || "30";
-		var graphTwo = $('.graph2 > .menu > .active').text().substring(0,2) || "30";
-
-
-		graphOne = graphOne === "12" ? "120" : graphOne;
-		graphTwo = graphTwo === "12" ? "120" : graphTwo;
-
-		$(".ticker").each(function(){
-			stockArr.push($(this).val().toUpperCase() || "GOOG");
-		});
-		console.log(stockArr,graphOne,graphTwo);
-		drawGraph(stockArr,graphOne,"chart1");
-		drawGraph(stockArr,graphTwo,"chart2");
-
-
+		var ticker = $("#ticker").val().toUpperCase() || "GOOG";
+		createStockObject(ticker);
 	};
-
-
 
 
 //ui stuff
@@ -246,11 +275,10 @@ $(function(){
 	});
 
 //Event Handlers
-	
-
-	
 	$(document).on('click','#draw-graph', setGraphs)
-	$(document).on('click','.bar',displayStats);
+	$(document).on('click','.bar',function () {
+		displayStats(getStock($(this).data("class")));
+	});;
 	$(document).on('click','#logout', function(){
 		window.location.replace('index.html');
 	});
@@ -258,22 +286,8 @@ $(function(){
 
 
 	//draw some bs stuff
-	drawGraph(["AAPL","MSFT"],"30","chart1");
-	drawGraph(["GOOG","LNKD"],"60","chart2");
-
+	createStockObject("SPY");	
 
 });	
 
 
-
-	//consider using this for a stock ticker
-	// $.getJSON('https://finance.google.com/finance/info?client=ig&q=NYSE:GOOG&callback=?',function(response){
-	// 	var stockInfo = response[0];
-	// 	var stockString ='<div class="stockWrapper">STOCK:';
-	// 	stockString +='<span class="stockSymbol">'+stockInfo.t+'</span>';
-	// 	stockString +='<span class="stockPrice">'+stockInfo.l+'</span>';
-	// 	stockString +='<span class="stockChange">'+stockInfo.c+'</span>';
-	// 	stockString +='<span>at</span> <span class="stockTime">'+stockInfo.ltt+'</span>';
-	// 	stockString +='</div>';
-	// 	$('.stockTick').prepend(stockString);
-	// });

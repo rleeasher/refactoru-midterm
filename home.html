@@ -39,7 +39,7 @@
 
     <div class="ui two column center aligned stackable grid">
       <div class="column d3">
-        <h3 class="ui dividing header left-align">Graph1</h3>
+        <h3 id="chart1-header" class="ui dividing header left-align">Graph1</h3>
         <svg class="chart1"></svg>
       </div>
       <div class="column d3">
@@ -49,16 +49,8 @@
           <div class="column">
 
             <div class="field">
-              <label>Ticker 1</label>
-              <input class="ticker" type="text">
-            </div>
-            <div class="field">
-              <label>Ticker 2</label>
-              <input class="ticker" type="text">
-            </div>
-            <div class="field">
-              <label>Ticker 3</label>
-              <input class="ticker" type="text">
+              <label>Ticker</label>
+              <input id="ticker" type="text">
             </div>
           </div>
 
@@ -67,7 +59,7 @@
               <div class="text">Graph 1</div>
               <i class="dropdown icon"></i>
               <div class="menu">
-                <div class="item">30 Day Volatility</div>
+                <div class="item active">30 Day Volatility</div>
                 <div class="item">60 Day Volatility</div>
                 <div class="item">90 Day Volatility</div>
                 <div class="item">120 Day Volatility</div>
@@ -81,7 +73,7 @@
               <i class="dropdown icon"></i>
               <div class="menu">
                 <div class="item">30 Day Volatility</div>
-                <div class="item">60 Day Volatility</div>
+                <div class="item active">60 Day Volatility</div>
                 <div class="item">90 Day Volatility</div>
                 <div class="item">120 Day Volatility</div>
               </div>
@@ -105,7 +97,7 @@
 
     <div class="ui two column center aligned stackable grid">
       <div class="column d3">
-      <h3 class="ui dividing header left-align">Graph2</h3>
+      <h3 id="chart2-header" class="ui dividing header left-align">Graph2</h3>
         <svg class="chart2"></svg>
       </div>
       <div class="column d3">
@@ -117,23 +109,27 @@
             <div class="row right-align">30 Day Volatility</div>
             <div class="row right-align">60 Day Volatility</div>
             <div class="row right-align">90 Day Volatility</div>
-            <div class="row right-align">120 Day Volatility</div>
-            <div class="row right-align">Price</div>
+            <div class="row right-align">120 Day Volatility</div>            
+            <div class="row right-align">Bid</div>
+            <div class="row right-align">Ask</div>
+            <div class="row right-align">Change</div>
             <div class="row right-align">P/E</div>
             <div class="row right-align">EPS</div>
-            <div class="row right-align">Beta</div>
+            <div class="row right-align">Market Cap</div>
           </div>
           <div class="column">
-            <div id="ticker" class="row"></div>
+            <div id="tickerlabel" class="row"></div>
             <div id="niceName" class="row"></div>
             <div id="30" class="row"></div>
             <div id="60" class="row"></div>
             <div id="90" class="row"></div>
             <div id="120" class="row"></div>
-            <div id="Price" class="row"></div>
+            <div id="Bid" class="row"></div>
+            <div id="Ask" class="row"></div>
+            <div id="Change" class="row"></div>
             <div id="PE" class="row"></div>
             <div id="EPS" class="row"></div>
-            <div id="Beta" class="row"></div>
+            <div id="MktCap" class="row"></div>
           </div>
         </div>
       </div>
