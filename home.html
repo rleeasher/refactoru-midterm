@@ -20,9 +20,26 @@
       <a class="active item">
         <i class="home icon"></i> Home
       </a>
-      <a class="item">
-        <i class="mail icon"></i> Messages
-      </a>
+      <div class="ui dropdown item">
+        <i class="mail icon"></i>Messages
+          <div class="menu">
+            <div class="ui form">
+              <div class="field">
+                <textarea class="message-area"></textarea>
+              </div>
+              <div class="field">
+                <div class="ui left labeled icon input">
+                  <input type="text" placeholder="Username">
+                  <i class="user icon"></i>
+                  <div class="ui corner label">
+                    <i class="icon asterisk"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="ui submit button">Submit</div>
+            </div>
+          </div>
+      </div>
       <div class="right menu">
          <div id="active-user" class="ui dropdown link item">
           Username
@@ -37,10 +54,7 @@
       </div>
     </div>
     <div id="breadcrumb">
-      <div class="ui mini divided button">
-        Testing
-        <i class="remove icon"></i>
-      </div>
+
     </div>
 
     <div class="ui two column center aligned stackable grid">
@@ -55,14 +69,13 @@
           <div class="column">
 
             <div class="field">
-              <label>Ticker</label>
-              <input id="ticker" type="text">
+              <input id="ticker" type="text" placeholder="Ticker">
             </div>
           </div>
 
           <div class="column">
             <div class="ui dropdown graph1">
-              <div class="text">Graph 1</div>
+              <div class="text">Volatility</div>
               <i class="dropdown icon"></i>
               <div class="menu">
                 <div class="item active">30 Day Volatility</div>
@@ -74,40 +87,26 @@
           </div>
 
           <div class="column">
-            <div class="ui dropdown graph2">
-              <div class="text">Graph 2</div>
-              <i class="dropdown icon"></i>
-              <div class="menu">
-                <div class="item">30 Day Volatility</div>
-                <div class="item active">60 Day Volatility</div>
-                <div class="item">90 Day Volatility</div>
-                <div class="item">120 Day Volatility</div>
+            <div class = "setting-submit">
+              <div id="draw-graph" class="ui green animated small button">
+                <div class="visible content">Draw Graphs</div>
+                <div class="hidden content">
+                  <i class="right arrow icon"></i>
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- submit button -->
-        <div class = "setting-submit">
-          <div id="draw-graph" class="fluid ui green animated massive button">
-            <div class="visible content">Draw Graphs</div>
-            <div class="hidden content">
-              <i class="right arrow icon"></i>
-            </div>
-          </div>
-        </div>
-
-
       </div>
-
-    </div>
-
+    </div> 
+<!-- end of top two sections -->
     <div class="ui two column center aligned stackable grid">
       <div class="column d3">
-      <h3 id="chart2-header" class="ui dividing header left-align">Graph2</h3>
+      <h3 id="chart2-header" class="ui dividing header left-align">Historical Volatility</h3>
         <svg class="chart2"></svg>
       </div>
       <div class="column d3">
-         <h3 class="ui dividing header left-align">Stats</h3>
+         <h3 class="ui dividing header left-align bar">Stats</h3>
          <div class="ui two column divided grid">
           <div class="column">
             <div class="row right-align">Ticker</div>
@@ -140,6 +139,21 @@
         </div>
       </div>
     </div>
+    <!-- MODAL -->
+    <div class="ui modal">
+      <div class="header">
+        Whoops! Something went wrong!
+      </div>
+      <div class="content">
+        <div class="left">
+          Usually this is because Yahoo Finance timed out. If you would like to try again hit OK!
+        </div>
+      </div>
+      <div class="actions">
+        <div class="ui negative button">Cancel</div>
+        <div class="ui positive button">OK</div>
+      </div>
+    </div>
 
 
 
@@ -147,6 +161,7 @@
   <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.12.0/javascript/semantic.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.0/d3.js" charset="utf-8"></script>
+  <script src="js/tip.js" type="text/javascript"></script>
   <script src="js/utility.js" type="text/javascript"></script>
   <script src="js/data.js" type="text/javascript"></script>
   <script src="js/home.js" type="text/javascript"></script>

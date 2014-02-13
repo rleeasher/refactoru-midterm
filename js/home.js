@@ -20,7 +20,7 @@ $(function(){
 
 	var randColor = function () {
 		var colors = pluck(marketData.stockList,"Color");
-		var randomNum = Math.floor((Math.random()*colors.length)+1);
+		var randomNum = Math.floor((Math.random()*colors.length));
 		return colors[randomNum];
 	};
 
@@ -66,6 +66,8 @@ $(function(){
 
 	}
 
+
+	//query yahoo for live data-- this breaks a lot/times out
 	var getStockObject = function(ticker, callback){
 		var str = 'http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20%3D%20%22'
 		+ ticker +'%22&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=';
@@ -73,9 +75,18 @@ $(function(){
 		$.getJSON(str,function(stockinfo){
 
 			if (stockinfo.query.results === null) {
-				getStockObject(ticker, function(){
-					console.log('failed');
-				});
+				console.log('failed');
+				$('.modal')
+				  .modal('setting', {
+				    closable  : false,
+				    onDeny    : function(){
+				    	return true;
+				    },
+				    onApprove : function() {
+				    	submitInfo();
+				    }
+				  })
+				  .modal('show');
 			} else {		
 				var stockInfo = stockinfo.query.results.quote;
 				callback(stockInfo);
@@ -87,7 +98,6 @@ $(function(){
 	//create a stock object
 	var createStockObject = function (ticker) {
 		queryYahooFinance(ticker, function(data){ 
-			console.log(data);
 			var var1 = map(pluck(data,"Close").slice(0,120),typearr);
 			variance1 = calculateVariance(var1);
 			var var2 = var1.slice(0,90);
@@ -105,10 +115,13 @@ $(function(){
 				if ($.inArray(ticker,pluck(stockDataArr,'ticker')) > -1) {
 					stockDataArr[$.inArray(ticker,pluck(stockDataArr,'ticker'))] = obj;
 				} else {
-					stockDataArr.push(obj);
+					stockDataArr.push(obj);					
+					$('<div class="ui mini divided button nohover"><span class="ticker">'+ticker+'</span><span class="remove">x</span></div>')
+						.appendTo('#breadcrumb')
+						.css('background',getStock(ticker).color);					
 				}
 				console.log(stockDataArr);
-				setUpGraph();
+				setUpGraph(ticker);
 			});
 		});
 	}
@@ -138,32 +151,41 @@ $(function(){
 		return stockDataArr[index];
 	}
 
+	var getStockIndex = function(ticker) {
+		return $.inArray(ticker,pluck(stockDataArr,'ticker'));
+	};
+
 //sets up drawing a graph
-	var setUpGraph = function () {
-		//set the graphs up with vars
+	var setUpGraph = function (ticker) {
+
+		//set stock graph one
 		var select1 = $('.graph1 > .menu > .active').text();
-		var select2 = $('.graph2 > .menu > .active').text();
-		console.log(select1);
-
 		$('#chart1-header').text(select1);
-		$('#chart2-header').text(select2);
-
 		var graphOne = ("vol" + select1.substring(0,2)).toString();
-		var graphTwo = ("vol" + select2.substring(0,2)).toString();
 		graphOne = graphOne === "vol" ? "vol30" : graphOne;
-		graphTwo = graphTwo === "vol" ? "vol30" : graphTwo;
 		graphOne = graphOne === "vol12" ? "vol120" : graphOne;
-		graphTwo = graphTwo === "vol12" ? "vol120" : graphTwo;
-		drawGraph(stockDataArr,graphOne,"chart1");
-		drawGraph(stockDataArr,graphTwo,"chart2");
+		drawGraph(getData(stockDataArr, graphOne),"chart1");
+
+		//set stock graph two
+		var arr = setGraphTwo(ticker);
+		drawGraph(arr,"chart2");
+		displayStats(stockDataArr[stockDataArr.length-1]);
+	};
+
+//sets up drawing the second graph -- diff array type
+	var setGraphTwo = function (ticker) {
+		var obj = getStock(ticker);
+		var arr = [];
+		arr.push( 	{'metric': obj.vol30, 'name': '30 Day Vol.', 'ticker':obj.ticker, 'color':obj.color},
+					{'metric': obj.vol60, 'name': '60 Day Vol.', 'ticker':obj.ticker, 'color':obj.color},
+					{'metric': obj.vol90, 'name': '90 Day Vol.', 'ticker':obj.ticker, 'color':obj.color},
+					{'metric': obj.vol120, 'name': '120 Day Vol.', 'ticker':obj.ticker, 'color':obj.color});
+		return arr;
 	};
 
 // this draws the graph 
-	var drawGraph = function (stocks, attribute, graphnum) {
-
-	    var data = getData(stocks, attribute);
+	var drawGraph = function (data, graphnum) {
 	    var graph = "." + graphnum;
-
 	    $(graph).html("");
 
 	    var margin = {top: 0,right: 30,bottom: 30,left: 40}
@@ -184,15 +206,23 @@ $(function(){
 	        .scale(y)
 	        .orient("left")
 	        .ticks(10);
-
+	    var tip = d3.tip()
+		  .attr('class', 'd3-tip')
+		  .offset([-10, 0])
+		  .html(function(d) {
+		    return "<span>Volatility: " + parseFloat(d.metric).toFixed(3) + "</span>";
+		  })
 
 	    //select the dom element here
 	    var chart = d3.select(graph)
 	        .attr("width", width + margin.left + margin.right)
-	        .attr("height", height + margin.top + margin.bottom)
+	        .attr("height", height + margin.top + margin.bottom +20)
 	        .append("g")
 	        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 	    	;
+	    	
+	    //applying the tip to the chart
+	    chart.call(tip);
 
 	    //set the x an y domain
 	    x.domain(data.map(function (d) {
@@ -205,31 +235,31 @@ $(function(){
 	    chart.append("g")
 	        .attr("class", "x axis")
 	        .attr("transform", "translate(0," + height + ")")
-	        .call(xAxis);
+	        .call(xAxis)
+	        ;
 
 	    chart.append("g")
 	        .attr("class", "y axis")
 	        .call(yAxis)
 	        .append("text")
-	        .attr("transform", "rotate(-90)")
-	        .attr("y", 6)
-	        .attr("dy", ".71em")
-	        .style("text-anchor", "end")
-	        .text(attribute);
+	        ;
 
+		          
 	    chart.selectAll(".bar")
 	        .data(data)
 	        .enter().append("rect")
-	        .attr("class", "bar")
+	        .attr("class", "ui bar")
 	    //added in a data class
 		    .attr("data-class", function (d) {return d.ticker;})
-		    .text(function (d) {return d.metric;})
 		    .style("fill", function (d) {return d.color;})
 	        .attr("x", function (d) {return x(d.name);})
 	        .attr("y", height)
 	        .attr("height", 0)
 	        .attr("width", x.rangeBand())
+		    .on('mouseover', tip.show)
+		    .on('mouseout', tip.hide)
 	        ;
+
 	    chart.selectAll(".bar")
 	    	.transition()
 	    	.duration(1000)
@@ -238,7 +268,6 @@ $(function(){
 	    	.attr("y", function(d) { return y(d.metric);})
       		;
 
-      	displayStats(stockDataArr[stockDataArr.length-1]);
 	};
 
 
@@ -262,11 +291,22 @@ $(function(){
 		$('#MktCap').fadeOut(fadeout,function(){ $(this).text(obj.MktCap).fadeIn(fadein); });
 	};
 
-	var setGraphs = function () {
-		var ticker = $("#ticker").val().toUpperCase() || "GOOG";
+	var submitInfo = function () {
+		var ticker = $("#ticker").val().toUpperCase() || "SPY";
 		createStockObject(ticker);
+
 	};
 
+	var removeObj = function (ticker) {
+		var ind = getStockIndex(ticker);
+		stockDataArr.splice(ind,1);
+		console.log(ind);
+		var lastObjTicker = stockDataArr[stockDataArr.length-1].ticker;
+		setUpGraph(lastObjTicker);
+
+	};
+
+//mouse stuff
 
 //ui stuff
 	$('.ui.dropdown')
@@ -274,20 +314,37 @@ $(function(){
 		on: 'hover'
 	});
 
+
 //Event Handlers
-	$(document).on('click','#draw-graph', setGraphs)
+	$(document).on('click','#draw-graph', function(){
+		submitInfo();
+	});
+	$(document).on('click','.remove', function () {
+		var ticker = $(this).prev().text();
+		$(this).closest('.button').remove();
+		removeObj(ticker);
+	});
 	$(document).on('click','.bar',function () {
-		displayStats(getStock($(this).data("class")));
+		var ticker = $(this).data("class");
+		var obj = getStock(ticker);
+		console.log(obj);
+		displayStats(obj);
+		var arr = setGraphTwo(ticker);
+		drawGraph(arr,"chart2");
 	});;
 	$(document).on('click','#logout', function(){
 		window.location.replace('index.html');
 	});
 
 
-
 	//draw some bs stuff
 	createStockObject("SPY");	
 
 });	
+
+
+
+
+
 
 
