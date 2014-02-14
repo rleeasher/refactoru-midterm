@@ -83,7 +83,7 @@ $(function(){
 				    	return true;
 				    },
 				    onApprove : function() {
-				    	submitInfo();
+				    	submitInfo(ticker);
 				    }
 				  })
 				  .modal('show');
@@ -220,7 +220,7 @@ $(function(){
 	        .append("g")
 	        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 	    	;
-	    	
+
 	    //applying the tip to the chart
 	    chart.call(tip);
 
@@ -283,7 +283,7 @@ $(function(){
 		$('#60').fadeOut(fadeout,function(){ $(this).text(obj.vol60.toFixed(2)).fadeIn(fadein); });
 		$('#90').fadeOut(fadeout,function(){ $(this).text(obj.vol90.toFixed(2)).fadeIn(fadein); });
 		$('#120').fadeOut(fadeout,function(){ $(this).text(obj.vol120.toFixed(2)).fadeIn(fadein); });
-		$('#Change').fadeOut(fadeout,function(){ $(this).text(obj.Change+"%").fadeIn(fadein); });
+		$('#Change').fadeOut(fadeout,function(){ $(this).text(obj.Change).fadeIn(fadein); });
 		$('#Bid').fadeOut(fadeout,function(){ $(this).text(obj.Bid).fadeIn(fadein); });
 		$('#Ask').fadeOut(fadeout,function(){ $(this).text(obj.Ask).fadeIn(fadein); });
 		$('#PE').fadeOut(fadeout,function(){ $(this).text(obj.PE).fadeIn(fadein); });
@@ -291,8 +291,9 @@ $(function(){
 		$('#MktCap').fadeOut(fadeout,function(){ $(this).text(obj.MktCap).fadeIn(fadein); });
 	};
 
-	var submitInfo = function () {
-		var ticker = $("#ticker").val().toUpperCase() || "SPY";
+	var submitInfo = function (ticker) {
+		var ticker = $("#ticker").val().toUpperCase() || ticker || "SPY";
+		$("#ticker").val('');
 		createStockObject(ticker);
 
 	};
